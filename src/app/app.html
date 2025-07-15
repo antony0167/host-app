@@ -1,1 +1,4 @@
-<iframe src="http://localhost:4201/" style="border: 2px solid red; height: 300px; width: 400px"></iframe>
+@for(url of urls; track $index) {
+  <iframe [src]="url" style="border: 2px solid red; height: 100px; width: 200px; margin: 10px"></iframe>
+}
+
