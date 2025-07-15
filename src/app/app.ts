@@ -23,7 +23,23 @@ export class App implements OnInit {
   @HostListener('window:message', ['$event'])
   handleButtonClicked(event: MessageEvent) {
     if (event.data?.type === 'buttonClicked') {
-      console.log('buttonClicked', event.data.detail);
+      const detail = event.data.detail;
+      console.log('buttonClicked', detail);
+      this.sendToChild(detail.sourceId, detail.targetId);
     }
   }
+
+  sendToChild(sourceId: number, targetId: number) {
+    const iframe = document.getElementById(`${targetId}`) as HTMLIFrameElement;
+
+    iframe?.contentWindow?.postMessage({
+      type: 'sendToChild',
+      detail: {
+        name: 'sendToChild',
+        sourceId: sourceId,
+        targetId: targetId
+      }
+    }, `http://localhost:4201/${targetId}`);
+  }
+
 }

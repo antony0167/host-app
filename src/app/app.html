@@ -1,4 +1,4 @@
 @for(url of urls; track $index) {
-  <iframe [src]="url" style="border: 2px solid red; height: 100px; width: 200px; margin: 10px"></iframe>
+  <iframe [src]="url" [id]=$index style="border: 2px solid red; height: 100px; width: 200px; margin: 10px"></iframe>
 }
 
