@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -12,7 +12,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class App implements OnInit {
   urls: any[] | undefined;
   n: number = 10;
-  sendRequests: boolean = false;
 
   constructor(private sanitizer: DomSanitizer) {}
 
@@ -20,27 +19,17 @@ export class App implements OnInit {
   ngOnInit() {
     this.urls = Array.from({ length: this.n }, (value, index) =>
       this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:4201/?id=${index}`));
-  }
 
-  @HostListener('window:message', ['$event'])
-  handleButtonClicked(event: MessageEvent) {
-    if (event.data?.type === 'sendMessage') {
-      const detail = event.data.detail;
-      this.sendToChild(detail.sourceId, detail.targetId);
-    }
-  }
-
-  sendToChild(sourceId: number, targetId: number) {
-    const iframe = document.getElementById(`${targetId}`) as HTMLIFrameElement;
-
-    iframe?.contentWindow?.postMessage({
-      type: 'sendToChild',
-      detail: {
-        name: 'sendToChild',
-        sourceId: sourceId,
-        targetId: targetId
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'http://localhost:4201') {
+        console.log("Unknown origin");
+        return;
       }
-    }, `http://localhost:4201/${targetId}`);
+
+      const iframe = document.getElementById(`${event.data.detail.targetId}`) as HTMLIFrameElement;
+
+      iframe?.contentWindow?.postMessage(event.data, 'http://localhost:4201');
+    });
   }
 
 }
