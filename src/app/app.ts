@@ -11,20 +11,21 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class App implements OnInit {
   urls: any[] | undefined;
+  n: number = 10;
+  sendRequests: boolean = false;
 
   constructor(private sanitizer: DomSanitizer) {}
 
 
   ngOnInit() {
-    this.urls = Array.from({ length: 10 }, (value, index) =>
+    this.urls = Array.from({ length: this.n }, (value, index) =>
       this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:4201/?id=${index}`));
   }
 
   @HostListener('window:message', ['$event'])
   handleButtonClicked(event: MessageEvent) {
-    if (event.data?.type === 'buttonClicked') {
+    if (event.data?.type === 'sendMessage') {
       const detail = event.data.detail;
-      console.log('buttonClicked', detail);
       this.sendToChild(detail.sourceId, detail.targetId);
     }
   }
