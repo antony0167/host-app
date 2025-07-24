@@ -12,13 +12,18 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class App implements OnInit {
   urls: any[] | undefined;
   n: number = 10;
+  private iframes!: NodeListOf<HTMLIFrameElement>;
+  private observer: MutationObserver | undefined;
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer) { }
 
 
   ngOnInit() {
-    this.urls = Array.from({ length: this.n }, (value, index) =>
-      this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:3000/mf/?id=${index}`));
+    this.iframes = document.querySelectorAll('iframe');
+    this.setupObserver();
+
+    this.urls = Array.from({ length: this.n }, () =>
+      this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:3000/mf/`));
 
     window.addEventListener('message', (event) => {
       if (event.origin !== 'http://localhost:3000') {
@@ -26,11 +31,27 @@ export class App implements OnInit {
         return;
       }
 
-      const iframes = document.querySelectorAll("iframe");
-
-      for (let iframe of iframes) {
+      for (let iframe of this.iframes) {
         iframe?.contentWindow?.postMessage(event.data, 'http://localhost:3000/mf');
       }
+    });
+
+  }
+
+  onClick() {
+    this.urls?.push(this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:3000/mf/`));
+    this.n++;
+  }
+
+  private setupObserver() {
+    this.observer = new MutationObserver(() => {
+      this.iframes = document.querySelectorAll('iframe');
+      console.log(this.iframes);
+    });
+
+    this.observer.observe(document.body, {
+      childList: true,
+      subtree: true
     });
   }
 

@@ -1,4 +1,8 @@
-@for(url of urls; track $index) {
-  <iframe [src]="url" [id]=$index style="border: 2px solid red; height: 200px; width: 200px; margin: 10px"></iframe>
-}
+<button (click)="onClick()">Add</button>
+<p>
+  @for(url of urls; track $index) {
+    <iframe [src]="url" [id]=$index style="border: 2px solid red; height: 200px; width: 200px; margin: 10px"></iframe>
+  }
+</p>
+
 
