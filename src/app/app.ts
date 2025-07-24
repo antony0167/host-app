@@ -18,17 +18,19 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.urls = Array.from({ length: this.n }, (value, index) =>
-      this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:4201/?id=${index}`));
+      this.sanitizer.bypassSecurityTrustResourceUrl(`http://localhost:3000/mf/?id=${index}`));
 
     window.addEventListener('message', (event) => {
-      if (event.origin !== 'http://localhost:4201') {
-        console.log("Unknown origin");
+      if (event.origin !== 'http://localhost:3000') {
+        console.log("Unknown origin", event.origin);
         return;
       }
 
-      const iframe = document.getElementById(`${event.data.detail.targetId}`) as HTMLIFrameElement;
+      const iframes = document.querySelectorAll("iframe");
 
-      iframe?.contentWindow?.postMessage(event.data, 'http://localhost:4201');
+      for (let iframe of iframes) {
+        iframe?.contentWindow?.postMessage(event.data, 'http://localhost:3000/mf');
+      }
     });
   }
 
